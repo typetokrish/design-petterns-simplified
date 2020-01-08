@@ -92,7 +92,7 @@ class PlainTextResponse
 }
 ```
 
-This means the AppiResponder uses methods setCode, setData and render exposed from an Interface of PlainTextResponse.
+This means the ApiResponder uses methods setCode(), setData() and render() exposed from an interface of PlainTextResponse.
 Let us see how we use the ApiResponder to process data and send response.
 
 ```
@@ -131,9 +131,32 @@ $api->sendResponse($data, $code);
 
 ```
 
-Now imagine you are at a situattion to send the api response as json than plain text and you have a library which has methods different than the PlainTextResponse. 
-You are not going to modify the APiResponder class which is your business logic, but you need some way to pass the JsonResponse library to ApiResponder to get the response as Json. 
-For this, you cannot pass JsonResponse directly since its interface differs from what being used by PlainTextResponse.
+Now imagine you are at a situattion to send the api response as json than plain text and you have a library which has methods different than the PlainTextResponse. But here our aim is not change the business logic to accomodate the new library.
+Meaning that you are not going to modify the APiResponder class which is your business logic, but you need some way to use the JsonResponse library inside ApiResponder to get the response as Json. 
+Let us see the JsonResponse class :
+
+```
+<?php
+
+namespace App\AdapterPattern\ThirdParty;
+
+/**
+ * New library that sends JsonResponse
+ */
+class JsonResponse {
+
+    public function response(array $data, string $statusCode) 
+    {
+        
+        echo "You are seeing this data in JSON format with HTTP Status Code as $statusCode";
+        print_r($data);
+        die();
+    }
+}
+
+
+```
+To use this in ApiResponder , we need a way to have same methods for JsonResponse or an extended class which is similar to PlainTextResponse. Here is the trick, we create an adaptor having same method signature that ApiResponder expects to not to change its implementation. We create the Adaptor, an extra class but uses JsonResponse inside it.
 
 Here you create an adaptor which provides an interface similar to PlainTextResponse but uses JsonResponse library internally. And you dont need to alter your busines logic or client implementation.
 
